@@ -2,11 +2,21 @@ import os
 import json
 
 def configurar_sistema():
-    if not os.path.exists("uploads_projetos"):
-        os.makedirs("uploads_projetos")
+    if not os.path.exists("PASTA_PROJETOS"):
+        os.makedirs("PASTA_PROJETOS")
 
 def listar_projetos():
-    arquivos = [f for f in os.listdir("uploads_projetos") if f.endswith(".json")]
+    if not os.path.exists("upload_projetos"):
+        print("")
+
+def listar
+
+    try:
+        arquivos = [f for f in os.listdir("PASTA_PROJETOS") if f.endswith(".json")]
+    except FileNotFoundError:
+        print("[ERRO] Pasta de projetos não encontrada.")
+        return []
+    
     print('\n'+'='*40)
     print(' PROJETOS CADASTRADOS')
     print('='*40)
@@ -34,14 +44,23 @@ def gerenciar_projeto():
 
     if escolha == 0:
         return
+    
+    if escolha < 1 or escolha > len(arquivos):
+        print("[ERRO] Escolha inválida.")
+        return
+    
+    nome_arquivo = arquivos[escolha - 1]
+    caminho = os.path.join("PASTA_PROJETOS", nome_arquivo)
 
     try:
+        with open(caminho, "r", encoding="utf-8") as f:
+            dados = json.load(f)
         nome_arquivo = arquivos[escolha - 1]
     except IndexError:
         print("[ERRO] Escolha inválida. Voltando ao menu.")
         return
 
-    caminho = os.path.join("uploads_projetos", nome_arquivo)
+    caminho = os.path.join("PASTA_PROJETOS", nome_arquivo)
 
     try:
         with open(caminho, "r", encoding="utf-8") as f:
