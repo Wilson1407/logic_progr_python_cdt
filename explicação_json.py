@@ -23,52 +23,54 @@ def listar_projetos():
             
 def gerenciar_projeto():
     arquivos = listar_projetos()
-    if not arquivos:
+    if not arquivos: 
         return
 
     try:
         escolha = int(input("\nEscolha o número do projeto para gerenciar (ou 0 para voltar): "))
-    except ValueError:
-        print("[ERRO] Por favor, insira um número válido.")
-        return
+        if escolha == 0: 
+            return
+        
+        if escolha < 1 or escolha > len(arquivos):
+            print("[ERRO] opção inválida")
+            return
 
-    if escolha == 0:
-        return
-
-    try:
         nome_arquivo = arquivos[escolha - 1]
-    except IndexError:
-        print("[ERRO] Escolha inválida. Voltando ao menu.")
-        return
+        caminho = os.path.join("uploads_projetos", nome_arquivo)
 
-    caminho = os.path.join("uploads_projetos", nome_arquivo)
-
-    try:
         with open(caminho, "r", encoding="utf-8") as f:
             dados = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        print(f"[ERRO] Não foi possível ler o projeto: {e}")
-        return
 
-    print(f"\n--- Dados Atuais ---")
-    print(f"Aluno: {dados.get('aluno', '')}")
-    print(f"Projeto: {dados.get('projeto', '')}")
+        print(f"\n--- Dados Atuais ---")
+        print(f"Aluno: {dados.get('aluno', '')}")
+        print(f"Projeto: {dados.get('projeto', '')}")
 
-    confirmar = input("\nDeseja alterar as informações desse projeto? (s/n): ").strip().lower()
-    if confirmar == 's':
-        dados['aluno'] = input(f"Novo nome [{dados.get('aluno', '')}]: ") or dados.get('aluno', '')
-        dados['projeto'] = input("Novo resumo: ") or dados.get('projeto', '')
+        confirmar = input("\nDeseja alterar as informações desse projeto? (s/n): ").strip().lower()
+        if confirmar == 's':
+            dados['aluno'] = input(f"Novo nome [{dados.get('aluno', '')}]: ") or dados.get('aluno', '')
+            dados['projeto'] = input("Novo resumo: ") or dados.get('projeto', '')
 
-        with open(caminho, "w", encoding="utf-8") as f:
-            json.dump(dados, f, indent=4, ensure_ascii=False)
-        print("\n[Sucesso] Projeto atualizado com sucesso!")
+            with open(caminho, "w", encoding="utf-8") as f:
+                json.dump(dados, f, indent=4, ensure_ascii=False)
+            print("\n[Sucesso] Projeto atualizado com sucesso!")
+
+    except ValueError:
+        print ("[ERRO] por favor, insira um número válido.")
+    except FileNotFoundError:
+        print("[ERRO] Arquivo não encontrado.")
+    except json.JSONDecodeError:
+        print("[ERRO] Arquivo JSON corrompido")
 
 def fazer_upload_json():
     print('\n'+ '='*40)
     print(' NOVO UPLOADS DE PROJETO')
     print('='*40)
     nome_aluno = input("Nome do aluno:").strip()
-    resumo = input("Resumo do projeto:")
+    resumo = input("Resumo do projeto:").strip()
+
+    if not nome_aluno or not resumo:
+        print("[ERRO] Nome e resumo são obrigatórios!")
+        return
 
     dados = {"aluno": nome_aluno, "projeto": resumo}
     nome_fich = nome_aluno.replace(" ","_").lower()
